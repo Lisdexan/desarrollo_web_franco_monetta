@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Avisos de Adopción</title>
+    <link rel="stylesheet" href="../css/adoption.css">
+</head>
+<body>
+    <h1>Listado de Avisos de Adopción</h1>
+    
+    <div id="listado-container">
+        <table id="tabla-avisos">
+            <thead>
+                <tr>
+                    <th>Fecha Publicación</th>
+                    <th>Fecha Entrega</th>
+                    <th>Comuna</th>
+                    <th>Sector</th>
+                    <th>Cantidad</th>
+                    <th>Tipo</th>
+                    <th>Edad</th>
+                    <th>Nombre</th>
+                    <th>Contacto</th>
+                    <th>Total Fotos</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <div id="detalle-container" style="display:none;">
+        <h2 id="detalle-nombre">XDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDPLACEHOLDER</h2>
+        <p><b>Tipo:</b> <span id="detalle-tipo"></span></p>
+        <p><b>Edad:</b> <span id="detalle-edad"></span></p>
+        <p><b>Comuna:</b> <span id="detalle-comuna"></span></p>
+        <p><b>Sector:</b> <span id="detalle-sector"></span></p>
+        <p><b>Cantidad:</b> <span id="detalle-cantidad"></span></p>
+        <p><b>Contacto:</b> <span id="detalle-contacto"></span></p>
+        <p><b>Fecha Publicación:</b> <span id="detalle-fechapub"></span></p>
+        <p><b>Fecha Entrega:</b> <span id="detalle-fechaent"></span></p>
+        <div id="detalle-fotos"></div>
+        <br>
+        <button id="volver-listado">Volver al listado</button>
+        <button id="volver-portada">Volver a la portada</button>
+    </div>
+
+    <script src="../js/adoption.js"></script>
+</body>
+</html>

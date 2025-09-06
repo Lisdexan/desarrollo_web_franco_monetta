@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    cursor: pointer;
+}
+
+th, td {
+    border: 1px solid #aaa;
+    padding: 8px;
+    text-align: center;
+}
+
+tr:hover {
+    background-color: #f0f0f0;
+}
+
+#detalle-fotos img {
+    width: 320px;
+    height: 240px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+#foto-grande img {
+    width: 800px;
+    height: 600px;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+}
+
