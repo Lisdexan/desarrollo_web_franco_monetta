@@ -1,0 +1,74 @@
+
+/* Contenedor principal para la cuadrícula */
+.adoptions-grid {
+    display: grid;
+    /* La cuadrícula se ajusta automáticamente, mínimo 300px por columna */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px; /* Espaciado entre tarjetas */
+    margin-top: 25px;
+    padding-bottom: 40px;
+}
+
+/* Tarjeta individual de adopción */
+.adoption-card {
+    /* Hereda .card de global_styles.css (sombra, fondo, hover) */
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Título de la tarjeta (Tipo de animal y comuna) */
+.adoption-card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    font-size: 1.3em;
+    border-bottom: 2px solid var(--primary-color); /* Línea de separación mejorada */
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+/* Marcador de posición de foto */
+.photo-placeholder {
+    width: 100%;
+    height: 200px;
+    background-color: #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--secondary-color);
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+/* Estilo para el botón "Ver Detalles" */
+.btn-primary {
+    display: block; /* Ocupa todo el ancho de la tarjeta */
+    width: 100%;
+    text-align: center;
+    padding: 10px 15px;
+    margin-top: 15px;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.3s, transform 0.1s;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background-color: var(--link-hover-color);
+    transform: translateY(-1px);
+}
+
+/* Responsividad para la cuadrícula en pantallas más pequeñas */
+@media (max-width: 600px) {
+    .adoptions-grid {
+        gap: 20px;
+    }
+}
