@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang = "en">
 <head>
     <title>Portada - Tarea 2 Adopción</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_global.css') }}">
@@ -8,12 +8,11 @@
     <h1>Bienvenido a la Plataforma de Adopciones</h1>
     <p>Aquí encontrarás a tus futuros compañeros caninos y felinos. ¡Adopta con responsabilidad!</p>
 
-    <!-- MENÚ DE OPCIONES -->
     <h2>Menú Principal</h2>
     <p>
-        <a href="{{ url_for('agregar_adopcion') }}"><button>Agregar Aviso de Adopción</button></a>
-        <a href="{{ url_for('lista_adopciones') }}"><button>Ver Listado Completo de Adopciones</button></a>
-        <!-- Botón de Estadísticas (pendiente en la tarea) -->
+        <a href="{{ url_for('agregar_adopcion') }}" class="button-link">Agregar Aviso de Adopción</a>
+        <a href="{{ url_for('lista_adopciones') }}" class="button-link">Ver Listado Completo de Adopciones</a>
+        
         <button disabled>Estadísticas (Pendiente)</button>
     </p>
 
@@ -21,12 +20,10 @@
 
     <h2>Últimos 5 Avisos de Adopción</h2>
 
-    <!-- LISTADO DE LOS ÚLTIMOS 5 AVISOS -->
     {% for aviso in ultimos_avisos %}
     <div>
         <h3>{{ aviso.nombre }} ({{ aviso.tipo | capitalize }})</h3>
         
-        <!-- Mostrar Foto -->
         {% set primera_foto = aviso.fotos.first() %}
         {% if primera_foto %}
         <img src="{{ url_for('static', filename=primera_foto.ruta_archivo) }}" 

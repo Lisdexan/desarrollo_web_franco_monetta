@@ -1,16 +1,16 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
-# Inicializa SQLAlchemy más tarde en app.py, aquí solo lo declaramos
+
 db = SQLAlchemy()
 
-# --- Modelos basados en tu tarea2.sql ---
+
 
 class Region(db.Model):
     __tablename__ = 'region'
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(200), nullable=False)
-    # Relación con Comuna
+
     comunas = db.relationship('Comuna', backref='region', lazy='dynamic')
 
 class Comuna(db.Model):
@@ -18,7 +18,7 @@ class Comuna(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(200), nullable=False)
     region_id = db.Column(db.Integer, db.ForeignKey('region.id'), nullable=False)
-    # Relación con AvisoAdopcion
+
     avisos = db.relationship('AvisoAdopcion', backref='comuna', lazy='dynamic')
 
 class AvisoAdopcion(db.Model):
@@ -37,18 +37,18 @@ class AvisoAdopcion(db.Model):
     fecha_entrega = db.Column(db.DateTime, nullable=False)
     descripcion = db.Column(db.Text(500), nullable=True)
 
-    # Relaciones para las otras tablas (opcional, pero útil)
+
     fotos = db.relationship('Foto', backref='aviso', lazy='dynamic')
     contactos = db.relationship('ContactarPor', backref='aviso', lazy='dynamic')
 
 class Foto(db.Model):
     __tablename__ = 'foto'
-    # La clave primaria de tu esquema es compuesta (id, actividad_id), 
-    # pero para el ORM simple, usamos 'id' como PK y 'actividad_id' como FK
+
+
     id = db.Column(db.Integer, primary_key=True)
     ruta_archivo = db.Column(db.String(300), nullable=False)
     nombre_archivo = db.Column(db.String(300), nullable=False)
-    # En tu esquema se llama 'actividad_id', aquí lo mapeamos
+
     actividad_id = db.Column(db.Integer, db.ForeignKey('aviso_adopcion.id'), nullable=False)
 
 class ContactarPor(db.Model):

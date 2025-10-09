@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang = "en">
 <head>
     <title>Lista de Adopciones</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_global.css') }}">
@@ -7,18 +7,14 @@
 </head>
 <body>
     <h1>Listado Completo de Adopciones</h1>
-    <!-- El botón de volver ahora apunta al index -->
     <p><a href="{{ url_for('index') }}">Volver a la Portada</a></p>
-    <p><a href="{{ url_for('agregar_adopcion') }}">
-        <button>+ Agregar Adopción</button>
-    </a></p>
+    
+    <p><a href="{{ url_for('agregar_adopcion') }}" class="button-link">+ Agregar Adopción</a></p>
 
-    <!-- Lista de Adopciones -->
     {% for aviso in adopciones %}
     <div>
         <h2>{{ aviso.nombre }} ({{ aviso.tipo | capitalize }})</h2>
-        
-        <!-- BUSCAR LA FOTO ASOCIADA -->
+
         {% set primera_foto = aviso.fotos.first() %}
         {% if primera_foto %}
         <img src="{{ url_for('static', filename=primera_foto.ruta_archivo) }}" 
@@ -46,7 +42,6 @@
     <p>No hay avisos de adopción disponibles.</p>
     {% endfor %}
 
-    <!-- Paginación -->
     <div>
         {% if paginador.has_prev %}
             <a href="{{ url_for('lista_adopciones', page=paginador.prev_num) }}">Anterior</a>

@@ -1,15 +1,15 @@
-/* --- VARIABLES --- */
+
 :root {
-    --primary-color: #007bff; /* Azul primario */
-    --secondary-color: #6c757d; /* Gris secundario */
-    --success-color: #28a745; /* Verde éxito */
-    --danger-color: #dc3545; /* Rojo peligro (errores) */
-    --background-color: #f8f9fa; /* Fondo ligero */
-    --card-background: #ffffff; /* Fondo del formulario */
-    --text-color: #343a40; /* Texto oscuro */
+    --primary-color: #007bff; 
+    --secondary-color: #6c757d; 
+    --success-color: #28a745; 
+    --danger-color: #dc3545; 
+    --background-color: #f8f9fa; 
+    --card-background: #ffffff; 
+    --text-color: #343a40; 
 }
 
-/* --- GLOBAL STYLES --- */
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--background-color);
@@ -38,17 +38,17 @@ a:hover {
     text-decoration: underline;
 }
 
-/* --- FORM CONTAINER (CARD) --- */
+
 form {
     background-color: var(--card-background);
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 600px; /* Ancho máximo para desktop */
+    max-width: 600px; 
 }
 
-/* --- FORM ELEMENTS --- */
+
 label {
     display: block;
     margin-top: 15px;
@@ -68,7 +68,7 @@ textarea {
     margin-top: 5px;
     border: 1px solid #ced4da;
     border-radius: 6px;
-    box-sizing: border-box; /* Incluye padding y border en el width total */
+    box-sizing: border-box; 
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -85,7 +85,7 @@ textarea {
     min-height: 100px;
 }
 
-/* --- RADIO BUTTONS / CHECKBOXES CONTAINER --- */
+
 .radio-group label, .radio-group input {
     display: inline;
     margin-right: 15px;
@@ -93,7 +93,7 @@ textarea {
     font-weight: 400;
 }
 
-/* --- BUTTONS --- */
+
 button[type="submit"] {
     display: block;
     width: 100%;
@@ -117,7 +117,7 @@ button[type="submit"]:active {
     transform: translateY(1px);
 }
 
-/* --- ERROR STYLES --- */
+
 .error { 
     color: var(--danger-color); 
     font-size: 0.9em; 
@@ -137,7 +137,7 @@ button[type="submit"]:active {
 
 .error-general {
     border: 1px solid var(--danger-color); 
-    background-color: #f8d7da; /* Fondo rojo claro */
+    background-color: #f8d7da; 
     color: var(--danger-color);
     padding: 10px;
     border-radius: 8px;
@@ -146,12 +146,12 @@ button[type="submit"]:active {
     text-align: center;
 }
 
-/* Ajuste para inputs de archivo, ya que no son tan anchos */
+
 input[type="file"] {
     padding: 8px;
 }
 
-/* Responsive adjustments (optional, but good practice) */
+
 @media (max-width: 768px) {
     form {
         padding: 20px;

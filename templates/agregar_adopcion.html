@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang = "en">
 <head>
     <title>Agregar Adopción</title>
     <style>
@@ -12,7 +12,6 @@
     <h1>Publicar Nuevo Aviso de Adopción</h1>
     <a href="{{ url_for('index') }}">Volver a la Portada</a>
     
-    <!-- Muestra un error general si existe -->
     {% if errors and errors.general %}
         <div class="error" style="border: 1px solid red; padding: 10px; margin-bottom: 15px;">
             {{ errors.general }}
@@ -20,8 +19,6 @@
     {% endif %}
 
     <form method="POST" enctype="multipart/form-data"> 
-        
-        <!-- Nombre Contacto -->
         <label for="nombre">Nombre Contacto:</label><br>
         <input type="text" 
                id="nombre" 
@@ -30,8 +27,6 @@
                value="{{ form_data.nombre if form_data else '' }}"
                class="{% if errors.nombre %}error-field{% endif %}">
         {% if errors.nombre %}<div class="error">{{ errors.nombre }}</div>{% endif %}<br><br>
-
-        <!-- Email -->
         <label for="email">Email:</label><br>
         <input type="email" 
                id="email" 
@@ -40,15 +35,12 @@
                value="{{ form_data.email if form_data else '' }}"
                class="{% if errors.email %}error-field{% endif %}">
         {% if errors.email %}<div class="error">{{ errors.email }}</div>{% endif %}<br><br>
-
-        <!-- Celular -->
         <label for="celular">Celular (Opcional):</label><br>
         <input type="text" 
                id="celular" 
                name="celular"
                value="{{ form_data.celular if form_data else '' }}"><br><br>
 
-        <!-- REGIÓN (Mantiene la selección si hay error) -->
         <label for="region_id">Región:</label><br>
         <select id="region_id" 
                 name="region_id" 
@@ -64,7 +56,6 @@
         </select>
         {% if errors.comuna_id %}<div class="error">{{ errors.comuna_id }}</div>{% endif %}<br><br>
 
-        <!-- COMUNA (El JavaScript se encargará de rellenar esto al cargar la página si hay form_data) -->
         <label for="comuna_id">Comuna:</label><br>
         <select id="comuna_id" 
                 name="comuna_id" 
@@ -74,7 +65,6 @@
             <option value="">Seleccione una Comuna</option>
         </select><br><br>
         
-        <!-- FOTO (Solo mostramos el error si existe) -->
         <label for="foto_animal">Subir Foto del Animal (JPG, PNG, GIF):</label><br>
         <input type="file" 
                id="foto_animal" 
@@ -83,7 +73,6 @@
                class="{% if errors.foto_animal %}error-field{% endif %}">
         {% if errors.foto_animal %}<div class="error">{{ errors.foto_animal }}</div>{% endif %}<br><br>
 
-        <!-- Tipo de Animal -->
         <label>Tipo de Animal:</label><br>
         <input type="radio" id="gato" name="tipo" value="gato"  
                {% if form_data and form_data.tipo == 'gato' %}checked{% endif %}>
@@ -93,7 +82,6 @@
         <label for="perro">Perro</label>
         {% if errors.tipo %}<div class="error">{{ errors.tipo }}</div>{% endif %}<br><br>
         
-        <!-- Cantidad -->
         <label for="cantidad">Cantidad:</label><br>
         <input type="number" 
                id="cantidad" 
@@ -104,7 +92,6 @@
                class="{% if errors.cantidad %}error-field{% endif %}">
         {% if errors.cantidad %}<div class="error">{{ errors.cantidad }}</div>{% endif %}<br><br>
         
-        <!-- Edad -->
         <label for="edad">Edad:</label><br>
         <input type="number" 
                id="edad" 
@@ -115,7 +102,6 @@
                class="{% if errors.edad %}error-field{% endif %}">
         {% if errors.edad %}<div class="error">{{ errors.edad }}</div>{% endif %}<br>
 
-        <!-- Unidad de Medida de Edad -->
         <label>Unidad de Medida de Edad:</label><br>
         <input type="radio" id="a" name="unidad_medida" value="a"  
                {% if form_data and form_data.unidad_medida == 'a' %}checked{% endif %}>
@@ -125,7 +111,6 @@
         <label for="m">Meses</label>
         {% if errors.unidad_medida %}<div class="error">{{ errors.unidad_medida }}</div>{% endif %}<br><br>
         
-        <!-- Fecha Máxima de Entrega -->
         <label for="fecha_entrega">Fecha Máxima de Entrega:</label><br>
         <input type="datetime-local" 
                id="fecha_entrega" 
@@ -135,7 +120,6 @@
                class="{% if errors.fecha_entrega %}error-field{% endif %}">
         {% if errors.fecha_entrega %}<div class="error">{{ errors.fecha_entrega }}</div>{% endif %}<br><br>
         
-        <!-- Descripción -->
         <label for="descripcion">Descripción (Máx. 500 caracteres):</label><br>
         <textarea id="descripcion" 
                   name="descripcion" 
@@ -144,22 +128,18 @@
         <button type="submit">Publicar Aviso</button>
     </form>
 
-    <!-- BLOQUE DE JAVASCRIPT: Mantiene el filtro dinámico y precarga la comuna si hay error -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const regionSelect = document.getElementById('region_id');
             const comunaSelect = document.getElementById('comuna_id');
             const initialRegionId = regionSelect.value;
-            // Usamos el valor de form_data.comuna_id que Flask nos envía tras un error
             const initialComunaId = "{{ form_data.comuna_id if form_data and form_data.comuna_id else '' }}"; 
 
-            // Función para cargar las comunas
             function loadComunas(regionId, selectedComunaId = null) {
                 comunaSelect.innerHTML = '<option value="">Cargando Comunas...</option>';
                 comunaSelect.disabled = true;
 
                 if (regionId) {
-                    // Reemplazamos el '0' del url_for por el ID de región
                     fetch(`{{ url_for('obtener_comunas', region_id=0) }}`.replace('0', regionId))
                         .then(response => {
                             if (!response.ok) {
@@ -175,7 +155,6 @@
                                 option.value = comuna.id;      
                                 option.textContent = comuna.nombre; 
                                 
-                                // Si hay un ID de comuna preseleccionado (después de un error), lo marca
                                 if (selectedComunaId && selectedComunaId.toString() === comuna.id.toString()) {
                                     option.selected = true;
                                 }
@@ -199,12 +178,11 @@
                 }
             }
             
-            // 1. Inicializar la comuna si el formulario se cargó después de un error
+
             if (initialRegionId) {
                 loadComunas(initialRegionId, initialComunaId);
             }
 
-            // 2. Event Listener para cambios futuros
             regionSelect.addEventListener('change', function() {
                 loadComunas(this.value); 
             });
