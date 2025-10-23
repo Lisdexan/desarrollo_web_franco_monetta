@@ -41,6 +41,8 @@ class AvisoAdopcion(db.Model):
     fotos = db.relationship('Foto', backref='aviso', lazy='dynamic')
     contactos = db.relationship('ContactarPor', backref='aviso', lazy='dynamic')
 
+    comentarios = db.relationship('Comentario', backref='aviso', lazy='dynamic')
+
 class Foto(db.Model):
     __tablename__ = 'foto'
 
@@ -57,3 +59,13 @@ class ContactarPor(db.Model):
     nombre = db.Column(db.Enum('whatsapp', 'telegram', 'X', 'instagram', 'tiktok', 'otra'), nullable=False)
     identificador = db.Column(db.String(150), nullable=False)
     actividad_id = db.Column(db.Integer, db.ForeignKey('aviso_adopcion.id'), nullable=False)
+
+class Comentario(db.Model):
+    __tablename__ = 'comentario'
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(80), nullable=False)
+    texto = db.Column(db.String(300), nullable=False)
+    # Usamos db.DateTime y default=datetime.utcnow tal como en AvisoAdopcion
+    fecha = db.Column(db.DateTime, nullable=False, default=datetime.utcnow) 
+    # Clave foránea que apunta al aviso
+    aviso_id = db.Column(db.Integer, db.ForeignKey('aviso_adopcion.id'), nullable=False)

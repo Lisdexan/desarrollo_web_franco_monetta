@@ -13,8 +13,9 @@
 
     {% for aviso in adopciones %}
     <div>
-        <h2>{{ aviso.nombre }} ({{ aviso.tipo | capitalize }})</h2>
-
+        <a href="{{ url_for('ver_aviso', aviso_id=aviso.id) }}" style="text-decoration: none; color: inherit;">
+            <h2>{{ aviso.nombre }} ({{ aviso.tipo | capitalize }})</h2>
+        </a>
         {% set primera_foto = aviso.fotos.first() %}
         {% if primera_foto %}
         <img src="{{ url_for('static', filename=primera_foto.ruta_archivo) }}" 

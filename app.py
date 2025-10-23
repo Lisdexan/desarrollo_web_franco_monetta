@@ -2,12 +2,12 @@ import os
 from werkzeug.utils import secure_filename
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
-
+from sqlalchemy import func, extract
 from config import Config
-from models import db, AvisoAdopcion, Comuna, Region, Foto
+from models import db, AvisoAdopcion, Comuna, Region, Foto, Comentario
 from datetime import datetime
 
-from validations import validate_aviso_adopcion 
+from validations import validate_aviso_adopcion, validate_comentario
 
 
 app = Flask(__name__)
@@ -152,6 +152,170 @@ def agregar_adopcion():
 
 
     return render_template('agregar_adopcion.html', regiones=regiones, errors={})
+
+
+@app.route('/estadisticas')
+def estadisticas():
+    """
+    Ruta que despliega la página de estadísticas y carga los gráficos vía AJAX.
+    Carga el nuevo archivo estadisticas.html.
+    """
+    return render_template('estadisticas.html')
+
+@app.route('/api/estadisticas/avisos_por_dia')
+def avisos_por_dia_api():
+    """API para el Gráfico 1: Avisos agregados por día (Líneas)."""
+    
+    # Agrupa por fecha (solo el día) y cuenta la cantidad de IDs
+    # (Usamos func.date() para agrupar por el día sin la hora)
+    data = db.session.query(
+        func.date(AvisoAdopcion.fecha_ingreso).label('fecha'),
+        func.count(AvisoAdopcion.id).label('cantidad')
+    ) \
+    .group_by(func.date(AvisoAdopcion.fecha_ingreso)) \
+    .order_by('fecha') \
+    .all()
+
+    # Formato: [{'fecha': 'YYYY-MM-DD', 'cantidad': X}]
+    result = [{'fecha': d.fecha.strftime('%Y-%m-%d'), 'cantidad': d.cantidad} for d in data]
+    return jsonify(result)
+
+@app.route('/api/estadisticas/avisos_por_tipo')
+def avisos_por_tipo_api():
+    """API para el Gráfico 2: Total de avisos por tipo (Torta)."""
+    
+    # Agrupa por tipo (perro/gato) y suma la cantidad de mascotas
+    data = db.session.query(
+        AvisoAdopcion.tipo,
+        func.sum(AvisoAdopcion.cantidad).label('total')
+    ) \
+    .group_by(AvisoAdopcion.tipo) \
+    .all()
+
+    # Formato para Pie chart: [{'name': 'Gato', 'y': X}, ...]
+    result = [{'name': d.tipo.capitalize(), 'y': int(d.total)} for d in data]
+    return jsonify(result)
+
+@app.route('/api/estadisticas/avisos_mensuales_por_tipo')
+def avisos_mensuales_por_tipo_api():
+    """API para el Gráfico 3: Avisos de perro/gato por mes (Barras)."""
+    
+    # Agrupa por año, mes y tipo.
+    # Usamos extract para obtener mes y año, crucial para un correcto agrupamiento.
+    data = db.session.query(
+        extract('year', AvisoAdopcion.fecha_ingreso).label('year'),
+        extract('month', AvisoAdopcion.fecha_ingreso).label('month'),
+        AvisoAdopcion.tipo,
+        func.count(AvisoAdopcion.id).label('cantidad')
+    ) \
+    .group_by('year', 'month', AvisoAdopcion.tipo) \
+    .order_by('year', 'month') \
+    .all()
+
+    # --- Lógica de formateo para el gráfico de barras agrupadas ---
+    meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    
+    # 1. Obtener todas las categorías (ej: "2024-Feb")
+    categorias_mes = sorted(list(set(f"{int(d.year)}-{meses[int(d.month)-1]}" for d in data)))
+    
+    # 2. Inicializar series
+    perros = [0] * len(categorias_mes)
+    gatos = [0] * len(categorias_mes)
+    
+    # 3. Llenar las series
+    for d in data:
+        categoria_str = f"{int(d.year)}-{meses[int(d.month)-1]}"
+        try:
+            index = categorias_mes.index(categoria_str)
+            if d.tipo == 'perro':
+                perros[index] = d.cantidad
+            elif d.tipo == 'gato':
+                gatos[index] = d.cantidad
+        except ValueError:
+            continue
+
+    result = {
+        'categories': categorias_mes,
+        'series': [
+            {'name': 'Perros', 'data': perros},
+            {'name': 'Gatos', 'data': gatos}
+        ]
+    }
+    return jsonify(result)
+
+# app.py (Continuación, después de las rutas de estadísticas)
+# ----------------------------------------------------------------------
+# RUTAS PARA DETALLE DE AVISO Y COMENTARIOS
+# ----------------------------------------------------------------------
+
+@app.route('/adopcion/<int:aviso_id>')
+def ver_aviso(aviso_id):
+    """
+    Ruta para ver la información de un aviso específico. 
+    Carga detalle_adopcion.html.
+    """
+    # Usa get_or_404 para manejar si el ID no existe
+    aviso = AvisoAdopcion.query.get_or_404(aviso_id)
+    return render_template('detalle_adopcion.html', aviso=aviso)
+
+
+@app.route('/api/comentarios/<int:aviso_id>', methods=['GET'])
+def obtener_comentarios_api(aviso_id):
+    """
+    API para obtener una lista JSON de comentarios para un aviso dado, 
+    ordenados por fecha descendente.
+    """
+    comentarios = Comentario.query.filter_by(aviso_id=aviso_id).order_by(Comentario.fecha.desc()).all()
+    
+    # Formatear la lista de comentarios a JSON
+    comentarios_json = [
+        {
+            'nombre': c.nombre, 
+            'texto': c.texto, 
+            'fecha': c.fecha.isoformat() # Usamos isoformat o strftime para la fecha/hora
+        } for c in comentarios
+    ]
+    return jsonify(comentarios_json)
+
+
+@app.route('/api/comentarios/<int:aviso_id>', methods=['POST'])
+def agregar_comentario_api(aviso_id):
+    """
+    API para agregar un nuevo comentario a un aviso. Retorna JSON de éxito o error.
+    """
+    
+    # 1. Verificar si el aviso existe
+    aviso = AvisoAdopcion.query.get(aviso_id)
+    if not aviso:
+        return jsonify({'success': False, 'message': 'Aviso de adopción no encontrado.'}), 404
+
+    # 2. Validar datos usando la nueva función
+    errors = validate_comentario(request.form)
+    if errors:
+        # Retorna el diccionario de errores con un código 400 (Bad Request)
+        return jsonify({'success': False, 'errors': errors}), 400
+    
+    # 3. Insertar en BD
+    try:
+        nuevo_comentario = Comentario(
+            nombre=request.form.get('nombre'),
+            texto=request.form.get('texto'),
+            aviso_id=aviso_id,
+            fecha=datetime.utcnow() 
+        )
+        db.session.add(nuevo_comentario)
+        db.session.commit()
+        
+        # Retornar éxito
+        return jsonify({
+            'success': True, 
+            'message': 'Comentario agregado con éxito.'
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error al guardar comentario: {e}")
+        return jsonify({'success': False, 'message': 'Error inesperado del servidor al guardar el comentario.'}), 500
 
 if __name__ == '__main__':
 

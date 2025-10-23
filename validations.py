@@ -131,3 +131,34 @@ def validate_aviso_adopcion(form_data, file_data):
             errors['foto_animal'] = 'El archivo de la foto no es una imagen válida (solo JPG, PNG, GIF).'
 
     return errors
+
+
+def validate_comentario(form_data):
+    """
+    Valida los campos del formulario de comentarios según el enunciado.
+    
+    :param form_data: Diccionario de los datos del formulario (request.form).
+    :return: Diccionario de errores. Si está vacío, la validación fue exitosa.
+    """
+    errors = {}
+    
+    # Obtener y limpiar datos
+    nombre = form_data.get('nombre', '').strip()
+    texto = form_data.get('texto', '').strip()
+
+    # Validación de Nombre (3 a 80 caracteres)
+    if not nombre:
+        errors['nombre'] = 'El nombre es obligatorio.'
+    elif not (3 <= len(nombre) <= 80):
+        errors['nombre'] = f'El nombre debe tener entre 3 y 80 caracteres (actualmente tiene {len(nombre)}).'
+
+    # Validación de Texto (Mínimo 5 caracteres, Máximo 300)
+    if not texto:
+        errors['texto'] = 'El texto del comentario es obligatorio.'
+    elif len(texto) < 5:
+        errors['texto'] = f'El comentario debe tener al menos 5 caracteres (actualmente tiene {len(texto)}).'
+    elif len(texto) > 300:
+        # Aunque el HTML lo limita a 300, esta es la validación final del lado del servidor.
+        errors['texto'] = 'El comentario no puede exceder los 300 caracteres.'
+
+    return errors
