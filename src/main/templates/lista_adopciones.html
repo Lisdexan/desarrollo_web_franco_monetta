@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+    <title>Lista de Adopciones</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_global.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_listado.css') }}">
+</head>
+<body>
+    <h1>Listado Completo de Adopciones</h1>
+    <p><a href="{{ url_for('index') }}">Volver a la Portada</a></p>
+    
+    <p><a href="{{ url_for('agregar_adopcion') }}" class="button-link">+ Agregar Adopción</a></p>
+
+    {% for aviso in adopciones %}
+    <div>
+        <a href="{{ url_for('ver_aviso', aviso_id=aviso.id) }}" style="text-decoration: none; color: inherit;">
+            <h2>{{ aviso.nombre }} ({{ aviso.tipo | capitalize }})</h2>
+        </a>
+        {% set primera_foto = aviso.fotos.first() %}
+        {% if primera_foto %}
+        <img src="{{ url_for('static', filename=primera_foto.ruta_archivo) }}" 
+             alt="Foto de {{ aviso.nombre }}" 
+             style="max-width: 200px; height: auto; border: 1px solid #ccc;">
+        {% else %}
+        <p>No hay foto disponible.</p>
+        {% endif %}
+
+        <p>
+            Cantidad: {{ aviso.cantidad }} | 
+            Edad: {{ aviso.edad }} 
+            {% if aviso.unidad_medida == 'a' %}
+                años
+            {% else %}
+                meses
+            {% endif %}
+        </p>
+        <p>Publicado el: {{ aviso.fecha_ingreso.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p>Comuna: {{ aviso.comuna.nombre if aviso.comuna else 'N/A' }}</p>
+        <p>Descripción: {{ aviso.descripcion }}</p>
+        <hr>
+    </div>
+    {% else %}
+    <p>No hay avisos de adopción disponibles.</p>
+    {% endfor %}
+
+    <div>
+        {% if paginador.has_prev %}
+            <a href="{{ url_for('lista_adopciones', page=paginador.prev_num) }}">Anterior</a>
+        {% endif %}
+        
+        <span>Página {{ paginador.page }} de {{ paginador.pages }}</span>
+
+        {% if paginador.has_next %}
+            <a href="{{ url_for('lista_adopciones', page=paginador.next_num) }}">Siguiente</a>
+        {% endif %}
+    </div>
+
+</body>
+</html>

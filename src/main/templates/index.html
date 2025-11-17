@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+    <title>Portada - Tarea 2 Adopción</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_global.css') }}">
+</head>
+<body>
+    <h1>Bienvenido a la Plataforma de Adopciones</h1>
+    <p>Aquí encontrarás a tus futuros compañeros caninos y felinos. ¡Adopta con responsabilidad!</p>
+
+    <h2>Menú Principal</h2>
+    <p>
+        <a href="{{ url_for('agregar_adopcion') }}" class="button-link">Agregar Aviso de Adopción</a>
+        <a href="{{ url_for('lista_adopciones') }}" class="button-link">Ver Listado Completo de Adopciones</a>
+        <a href="{{ url_for('estadisticas') }}" class="button-link">Estadísticas</a>
+        <a href="{{ url_for('evaluar_avisos') }}" class="button-link">Evaluar Avisos de Adopción</a>
+    </p>
+
+    <hr>
+
+    <h2>Últimos 5 Avisos de Adopción</h2>
+
+    {% for aviso in ultimos_avisos %}
+    <div>
+        <h3>{{ aviso.nombre }} ({{ aviso.tipo | capitalize }})</h3>
+        
+        {% set primera_foto = aviso.fotos.first() %}
+        {% if primera_foto %}
+        <img src="{{ url_for('static', filename=primera_foto.ruta_archivo) }}" 
+             alt="Foto de {{ aviso.nombre }}" 
+             style="max-width: 150px; height: auto; border: 1px solid #ccc;">
+        {% else %}
+        <p>No hay foto disponible.</p>
+        {% endif %}
+
+        <p>
+            Cantidad: {{ aviso.cantidad }} | 
+            Edad: {{ aviso.edad }} 
+            {% if aviso.unidad_medida == 'a' %}
+                años
+            {% else %}
+                meses
+            {% endif %}
+        </p>
+        <p>Publicado el: {{ aviso.fecha_ingreso.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p>Comuna: {{ aviso.comuna.nombre if aviso.comuna else 'N/A' }}</p>
+        <p>Contacto: {{ aviso.email }}</p>
+        <p>Descripción: {{ aviso.descripcion[:100] }}</p>
+        <hr>
+    </div>
+    {% else %}
+    <p>Aún no hay avisos de adopción publicados en la base de datos.</p>
+    {% endfor %}
+
+</body>
+</html>
