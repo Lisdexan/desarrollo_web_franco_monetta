@@ -13,22 +13,21 @@ import tareaweb.service.AvisoService;
 @RequestMapping("/")
 public class EvaluacionWebController {
 
-    @Autowired
-    private AvisoService avisoService;
+	@Autowired
+	private AvisoService avisoService;
 
-    // Cuando el navegador accede a la lista, lo redirigimos a la URL completa para asegurarnos de que el puerto sea 8080
-    @GetMapping({"/", "/evaluar_avisos"})
-    public String listarAvisos(Model model) {
-        model.addAttribute("avisos", avisoService.listarTodos());
-        return "avisoleaf";
-    }
+	@GetMapping({"/", "/evaluar_avisos"})
+	public String listarAvisos(Model model) {
+		model.addAttribute("avisos", avisoService.listarTodos());
+		return "avisoleaf";
+	}
 
-    @GetMapping("/guardarNota")
-    public String guardarNota(@RequestParam("avisoId") Long avisoId, @RequestParam("nota") Integer nota) {
-        
-        avisoService.guardarYRecalcularNota(avisoId, nota);
-        
-        // Redirección ABSOLUTA para que, después de guardar, siempre regrese a 8080.
-        return "redirect:http://127.0.0.1:8080/evaluar_avisos";
-    }
+	@GetMapping("/guardarNota")
+	public String guardarNota(@RequestParam("avisoId") Long avisoId, @RequestParam("nota") Integer nota) {
+		
+		// Llamada al servicio sin el parámetro de comentario
+		avisoService.asignarNotaYAplicarPromedio(avisoId, nota);
+		
+		return "redirect:http://127.0.0.1:8080/evaluar_avisos";
+	}
 }

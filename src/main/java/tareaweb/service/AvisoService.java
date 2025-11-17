@@ -1,45 +1,51 @@
 package tareaweb.service;
 
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
+
 import tareaweb.model.AvisoAdopcion;
 import tareaweb.model.Nota;
-import tareaweb.repository.AvisoAdopcionRepository;
-import tareaweb.repository.NotaRepository; 
-
-import java.util.List;
-import java.util.NoSuchElementException;
+import tareaweb.repository.AvisoRepository;
+import tareaweb.repository.NotaRepository;
 
 @Service
 public class AvisoService {
 
-    @Autowired
-    private AvisoAdopcionRepository avisoRepository; 
-    
-    @Autowired
-    private NotaRepository notaRepository; 
+	@Autowired
+	private AvisoRepository avisoRepository;
+	
+	@Autowired
+	private NotaRepository notaRepository;
+	
+	public List<AvisoAdopcion> listarTodos() {
+		return avisoRepository.findAll();
+	}
 
-    @Transactional(readOnly = true)
-    public List<AvisoAdopcion> listarTodos() {
-        return avisoRepository.findAll();
-    }
-    
-    @Transactional(readOnly = true)
-    public AvisoAdopcion obtenerAvisoPorId(Long id) {
-        return avisoRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Aviso no encontrado con ID: " + id));
-    }
-
-    @Transactional
-    public void guardarYRecalcularNota(Long idAviso, Integer valorNota) {
-        AvisoAdopcion aviso = obtenerAvisoPorId(idAviso);
-        
-        // 1. ELIMINAR TODAS LAS NOTAS PREVIAS usando el nuevo método explícito
-        notaRepository.eliminarNotasPorAvisoId(idAviso);
-        
-        // 2. Crear y guardar la nueva nota (será la única)
-        Nota nuevaNota = new Nota(aviso, valorNota, "Evaluador_Web"); 
-        notaRepository.save(nuevaNota);
-    }
+	@Transactional
+	
+	public AvisoAdopcion asignarNotaYAplicarPromedio(Long avisoId, Integer valorNota) {
+		Optional<AvisoAdopcion> avisoOpt = avisoRepository.findById(avisoId);
+		
+		if (avisoOpt.isEmpty()) {
+			throw new RuntimeException("AvisoAdopcion con ID " + avisoId + " no encontrado.");
+		}
+		
+		AvisoAdopcion aviso = avisoOpt.get();
+		
+		
+		Nota nuevaNota = new Nota(aviso, valorNota);
+		
+		notaRepository.save(nuevaNota);
+		
+        if (!aviso.getNotas().contains(nuevaNota)) {
+            aviso.getNotas().add(nuevaNota);
+        }
+		
+		aviso.calcularYActualizarPromedio();
+		
+		return avisoRepository.save(aviso);
+	}
 }

@@ -1,6 +1,6 @@
 tareaweb\repository\NotaRepository.class
 tareaweb\service\AvisoService.class
-tareaweb\repository\AvisoAdopcionRepository.class
+tareaweb\repository\AvisoRepository.class
 tareaweb\TareawebApplication.class
 tareaweb\model\AvisoAdopcion.class
 tareaweb\controller\EvaluacionWebController.class

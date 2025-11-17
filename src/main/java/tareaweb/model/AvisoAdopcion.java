@@ -1,60 +1,75 @@
-package tareaweb.model; 
+package tareaweb.model;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Transient;
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 
 @Entity
 public class AvisoAdopcion {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "fecha_publicacion")
 	private LocalDate fechaPublicacion;
-
 	private String sector;
-
-	private int cantidad;
-
+	private Integer cantidad;
 	private String tipo;
-
-	private String edad; 
-
+	private String edad;
 	private String comuna;
 	
-	// ******* CAMBIO CLAVE 1: RELACIÓN CON NOTAS *******
-	@OneToMany(mappedBy = "aviso") 
-	private List<Nota> notas;
-
-	public AvisoAdopcion() {}
+	@OneToMany(mappedBy = "aviso", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Nota> notas = new ArrayList<>();
 	
-	// ******* CAMBIO CLAVE 2: MÉTODO getNotaPromedio() *******
-	/**
-	 * Calcula la nota promedio basada en las notas relacionadas.
-	 * Este método es llamado por Thymeleaf como ${aviso.notaPromedio}.
-	 */
-	@Transient
-	public Double getNotaPromedio() {
-		if (this.notas == null || this.notas.isEmpty()) {
-			return null;
+	private Double promedioNota;
+
+
+	public AvisoAdopcion() {
+		this.promedioNota = 0.0;
+	}
+	
+	public AvisoAdopcion(Long id, LocalDate fechaPublicacion, String sector, Integer cantidad, String tipo, String edad, String comuna) {
+		this.id = id;
+		this.fechaPublicacion = fechaPublicacion;
+		this.sector = sector;
+		this.cantidad = cantidad;
+		this.tipo = tipo;
+		this.edad = edad;
+		this.comuna = comuna;
+		this.promedioNota = 0.0;
+	}
+	
+	public Double calcularYActualizarPromedio() {
+		if (notas == null || notas.isEmpty()) {
+			this.promedioNota = 0.0;
+			return 0.0;
+		}
+
+		double sumaValores = notas.stream()
+			.mapToInt(Nota::getValor)
+			.sum();
+		
+		long cantidadNotas = notas.size();
+		
+		if (cantidadNotas > 0) {
+			BigDecimal promedioBD = BigDecimal.valueOf(sumaValores)
+											.divide(BigDecimal.valueOf(cantidadNotas), 2, RoundingMode.HALF_UP);
+			this.promedioNota = promedioBD.doubleValue();
+		} else {
+			this.promedioNota = 0.0;
 		}
 		
-		double suma = 0.0;
-		// Asume que la entidad Nota tiene un método getValor() que retorna la nota (int/double)
-		for (Nota nota : this.notas) { 
-			suma += nota.getValor(); 
-		}
-		
-		return suma / this.notas.size();
+		return this.promedioNota;
 	}
 
-
-	// --- Getters and Setters existentes (se mantienen) ---
 
 	public Long getId() {
 		return id;
@@ -80,11 +95,11 @@ public class AvisoAdopcion {
 		this.sector = sector;
 	}
 
-	public int getCantidad() {
+	public Integer getCantidad() {
 		return cantidad;
 	}
 
-	public void setCantidad(int cantidad) {
+	public void setCantidad(Integer cantidad) {
 		this.cantidad = cantidad;
 	}
 
@@ -111,12 +126,20 @@ public class AvisoAdopcion {
 	public void setComuna(String comuna) {
 		this.comuna = comuna;
 	}
-	
+
 	public List<Nota> getNotas() {
 		return notas;
 	}
 
 	public void setNotas(List<Nota> notas) {
 		this.notas = notas;
+	}
+
+	public Double getPromedioNota() {
+		return promedioNota;
+	}
+
+	public void setPromedioNota(Double promedioNota) {
+		this.promedioNota = promedioNota;
 	}
 }

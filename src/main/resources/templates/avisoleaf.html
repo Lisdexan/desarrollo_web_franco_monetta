@@ -27,7 +27,7 @@
 				<th>Sector</th> 
 				<th>Cantidad Tipo Edad</th> 
 				<th>Comuna</th>
-				<th>Nota</th> 
+				<th>Promedio Nota</th> 
 				<th>Acción</th> 
 			</tr>
 		</thead>
@@ -46,7 +46,7 @@
 				
 				<td th:text="${aviso.comuna}">Santiago</td>
 				
-				<td th:text="${aviso.notaPromedio != null ? #numbers.formatDecimal(aviso.notaPromedio, 1, 1) : '-'}">-</td>
+				<td th:text="${aviso.promedioNota != null ? #numbers.formatDecimal(aviso.promedioNota, 1, 1) : '-'}">-</td>
 				
 				<td>
 					<a href="#" th:onclick="|cambiarNota(${aviso.id})|">evaluar</a>
